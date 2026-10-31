@@ -1,6 +1,8 @@
-from mqtt_frame import MqttClient
+from mqtt_frame import DeviceClient
 
-if __name__ == '__main__':
-    with MqttClient() as client:
-        print(client.call('motor1', 'move', 100))
-        print(client.multicast('motors', 'move', 100, expected={'motor1'}))
+client = DeviceClient("motor1").start()
+try:
+    print(client.move(100.0))
+    print(client.get_position())
+finally:
+    client.close()

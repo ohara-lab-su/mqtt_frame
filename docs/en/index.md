@@ -1,16 +1,18 @@
 # mqtt_frame
 
-MQTT-based device communication without MQTT dependencies in device classes.
+[![en](https://img.shields.io/badge/lang-en-red.svg)](../en/index.html)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](../ja/index.html)
 
-## Semantics
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Fmqtt_frame-181717?logo=github)](https://github.com/ohara-lab-su/mqtt_frame/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](./index.html)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
 
-- Unicast `call(device, method, ...)`: returns one result or raises `RpcError`/`RpcTimeout`.
-- Multicast `multicast(group, method, ..., expected={...})`: collects responses until all expected devices respond or the deadline expires.
-- Without `expected`, multicast collects until the deadline and cannot prove completeness.
-- Events use `publish_event(name, value)` and `subscribe(device, name, callback)`.
+```{toctree}
+:maxdepth: 2
 
-## Limitations
+usage
+design
+api
+```
 
-QoS 1 can redeliver requests; **duplicate execution is not prevented**. MQTT delivery acknowledgement does not imply successful device execution. Do not use this implementation for safety interlocks. Authorization, control ownership and audit logging require deployment-specific design. Only JSON-serializable values are supported. Synchronous API only.
-
-See [README](../../README.md) for examples.
+A lightweight MQTT transport for existing Python device classes. The device class does not depend on MQTT. Transparent single-target method invocation and independent native Pub/Sub are provided. **Experimental; not verified with a real broker.**

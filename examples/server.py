@@ -1,9 +1,10 @@
-from mqtt_frame import MqttDeviceServer
+import time
+from device import Motor
+from mqtt_frame import DeviceServer
 
-class Motor:
-    def move(self, position):
-        return {'position': position}
-
-if __name__ == '__main__':
-    with MqttDeviceServer(Motor(), 'motor1', groups=['motors'], methods=['move']):
-        input('Enterで終了: ')
+server = DeviceServer(Motor(), "motor1").start()
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    server.close()

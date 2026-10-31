@@ -1,24 +1,18 @@
 # mqtt_frame
 
-MQTTのPub/Subを使って、デバイスクラスに通信依存を導入せず、一対一RPCと一対多RPCを実装します。
+[![en](https://img.shields.io/badge/lang-en-red.svg)](../en/index.html)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](../ja/index.html)
 
-## 通信意味論
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Fmqtt_frame-181717?logo=github)](https://github.com/ohara-lab-su/mqtt_frame/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](./index.html)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.html)
 
-- Unicast: `call(device, method, ...)` は最初の応答を返す。失敗時は `RpcError`、無応答は `RpcTimeout`。
-- Multicast: `multicast(group, method, ..., expected={...})` は期待する全デバイスから応答が来るか期限まで待つ。戻り値は `MulticastResult`。
-- `expected=None`: 対象一覧が不明なため期限まで受信する。完全性は保証しない。
-- Event: `publish_event(name, value)` と `subscribe(device, name, callback)`。
+```{toctree}
+:maxdepth: 2
 
-## 制約
+usage
+design
+api
+```
 
-Brokerによる配送確認は装置の実行完了を意味しません。QoS 1では再配送されることがあり、moveなど非冪等な操作を重複実行する可能性があります。現在の実装は重複排除を行いません。安全インターロックには使用しないでください。各装置の制御権・認可・監査ログは別途必要です。
-
-JSONで表現できる引数と戻り値に限定します。同期APIのみです。グループの対象確定・探索は未実装です。
-
-## 構成
-
-`src/mqtt_frame/client.py` はクライアント、`server.py` は装置公開、`topics.py` はトピック、`codec.py` はJSON形式を扱います。
-
-## 利用例
-
-[README](../../README.md)を参照してください。
+既存のPythonデバイスクラスを変更せず、MQTTで公開するための軽量通信フレームです。単一対象の透過型メソッド呼び出しと、独立したPub/Subを提供します。**試作段階であり、実Broker通信は未検証です。**

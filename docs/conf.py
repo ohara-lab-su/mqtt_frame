@@ -1,5 +1,9 @@
-project = 'mqtt_frame'
-extensions = ['myst_parser', 'sphinx.ext.autodoc', 'sphinx.ext.napoleon']
-source_suffix = {'.md': 'markdown'}
-exclude_patterns = ['_build']
-html_theme = 'alabaster'
+"""Sphinx共通設定。"""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+project = "mqtt_frame"
+master_doc = "index"
+extensions = ["myst_parser", "sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+html_theme = "sphinx_rtd_theme"
+exclude_patterns = ["_build"]
