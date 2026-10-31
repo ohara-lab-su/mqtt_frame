@@ -1,46 +1,25 @@
 # mqtt_frame
 
-MQTT Brokerを介したデバイス向け通信フレーム。単一デバイスRPC、複数デバイスへの一斉RPC、イベント配信を提供します。デバイスクラスはMQTTをimportしません。
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/ohara-lab-su/mqtt_frame/blob/main/README.md)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](https://github.com/ohara-lab-su/mqtt_frame/blob/main/README.ja.md)
 
-**状態:** 0.1.0 初期実装。既存のgrpc_frame/ese774_frameとのAPI互換性は未検証です。実機制御に投入する前に接続試験・認可・再送対策が必要です。
+[![GitHub](https://img.shields.io/badge/GitHub-ohara--lab--su%2Fmqtt_frame-181717?logo=github)](https://github.com/ohara-lab-su/mqtt_frame/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/mqtt_frame/en/)
+[![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
 
-## インストール
+> **Experimental: not validated against a live MQTT broker.**
+
+Lightweight MQTT communication frame for existing Python device classes, alongside `ese774_frame` and `grpc_frame`. Device classes remain independent of communication. Dynamic single-device RPC and independent native Pub/Sub are provided. Group method-request delivery is available via `GroupPublisher` and `DeviceServer(groups=...)`; response aggregation and exactly-once execution are not implemented.
 
 ```bash
-pip install .
+python -m pip install .
 ```
 
-## 使用例
+[Examples](examples/README.md) · [Design](docs/en/design.md) · [Documentation](https://ohara-lab-su.github.io/mqtt_frame/en/)
 
-サーバー:
 
-```python
-from mqtt_frame import MqttDeviceServer
+[Examples / 実行例](examples/README.md) · [Documentation / ドキュメント](https://ohara-lab-su.github.io/mqtt_frame/)
 
-class Motor:
-    def move(self, position):
-        return {"position": position}
+## Bundled MQTT broker
 
-with MqttDeviceServer(Motor(), "motor1", groups=["motors"], methods=["move"]):
-    input("Enterで終了")
-```
-
-クライアント:
-
-```python
-from mqtt_frame import MqttClient
-
-with MqttClient() as client:
-    print(client.call("motor1", "move", 100))
-    print(client.multicast("motors", "move", 100, expected={"motor1"}).responses)
-```
-
-`expected`を指定しないmulticastはタイムアウトまで応答を収集します。各応答には`ok`/`result`または`error`が含まれます。応答がないことは未実行を意味しません。
-
-## ドキュメント
-
-- [日本語](docs/ja/index.md)
-- [English](docs/en/index.md)
-- [GitHub Pages](https://ohara-lab-su.github.io/mqtt_frame/)
-
-Apache-2.0。詳しくは[LICENSE](LICENSE)。
+`pip install .` installs `amqtt` (MQTT 3.1.1 broker) and `paho-mqtt` automatically. Start the local development broker with `mqtt-frame-broker` (default `127.0.0.1:1883`), or run `python examples/start_broker.py`. Authentication is disabled by default: do not expose this listener to untrusted networks. The RPC reply topic and correlation ID are carried in the JSON payload for MQTT 3.1.1 compatibility.

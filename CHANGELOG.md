@@ -1,8 +1,14 @@
-# CHANGELOG
+# Changelog
 
-## 0.1.0 — 2026-10-30
+## 0.1.0 (experimental)
 
-- MQTT 5の独自機能には依存しないJSON RPCの最小実装を追加。
-- 単一対象RPC、グループ配信と応答集約、イベント購読を追加。
-- 日本語・英語ドキュメントとGitHub Pages公開設定を追加。
-- 未対応: DeviceProxy自動生成、pyi生成、非同期API、発見機構、重複実行防止、再接続中の保留要求復旧。
+- Pythonデバイスクラスの動的RPC公開とクライアントProxyを試作。
+- MQTT 5 Response Topic / Correlation Dataによる単一対象RPCを実装。
+- RPCと独立したPublisher / Subscriberを追加。
+- 英語・日本語Sphinxドキュメント、GitHub Pages、PyPI公開ワークフローを追加。
+- 一対多デバイスRPC、property透過化、実Broker試験は未完了。
+
+- aMQTT Brokerを通常依存関係に追加し、`mqtt-frame-broker` 起動コマンドを提供。
+- MQTT 3.1.1 に通信プロトコルを統一し、返信先を本文で管理。
+
+- examples/README.md をBrokerのPythonスクリプト起動から一対一・一対多の実行順序まで日英で改訂。docs/ja・docs/en の使用方法にも反映。

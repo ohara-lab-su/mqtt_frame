@@ -1,4 +1,7 @@
-"""MQTT通信フレーム。"""
-from .client import MqttClient, RpcError, RpcTimeout, MulticastResult
-from .server import MqttDeviceServer
-__all__ = ["MqttClient", "MqttDeviceServer", "RpcError", "RpcTimeout", "MulticastResult"]
+"""通信非依存のデバイスクラスをMQTTに公開するためのフレーム。"""
+from .client import DeviceClient, DeviceProxy
+from .server import DeviceServer
+from .pubsub import Publisher, Subscriber
+from .errors import RemoteError
+from .group import GroupPublisher
+__all__ = ["DeviceClient", "DeviceProxy", "DeviceServer", "Publisher", "Subscriber", "RemoteError", "GroupPublisher"]
