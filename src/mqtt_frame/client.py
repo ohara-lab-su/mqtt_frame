@@ -1,8 +1,6 @@
 """動的ディスパッチによる透過型RPCクライアント。"""
 import threading
 import uuid
-import paho.mqtt.properties as mqtt_properties
-from paho.mqtt.packettypes import PacketTypes
 from .transport import Connection
 from .protocol import dumps, loads, device_topic
 from .errors import RemoteError
@@ -41,11 +39,8 @@ class DeviceClient:
         with self._lock:
             self._pending[request_id] = pending
         try:
-            props = mqtt_properties.Properties(PacketTypes.PUBLISH)
-            props.ResponseTopic = self.response_topic
-            props.CorrelationData = request_id.encode("ascii")
             self.connection.publish(self.request_topic, dumps({"id": request_id, "method": method,
-                                                                "args": args, "kwargs": kwargs}), properties=props)
+                                                                "args": args, "kwargs": kwargs, "reply_to": self.response_topic}))
             if not pending["event"].wait(timeout):
                 raise TimeoutError(f"MQTT RPC応答タイムアウト: {method}")
             response = pending["response"]

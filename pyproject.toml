@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mqtt-frame"
-version = "0.1.0"
+version = "0.0.0"
 description = "Transparent Python device RPC and native MQTT publish/subscribe transport"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {file = "LICENSE"}
-authors = [{name = "Ohara Lab"}]
-dependencies = ["paho-mqtt>=2.0,<3"]
+license = { file = "LICENSE" }
+authors = [{ name = "Ohara Lab" }]
+dependencies = ["paho-mqtt>=2.0,<3", "amqtt>=0.12.1,<0.13"]
 classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: Apache Software License"]
 
 [project.urls]
@@ -20,3 +20,6 @@ Repository = "https://github.com/ohara-lab-su/mqtt_frame"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.scripts]
+mqtt-frame-broker = "mqtt_frame.broker:main"

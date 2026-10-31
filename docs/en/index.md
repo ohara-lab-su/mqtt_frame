@@ -16,3 +16,7 @@ api
 ```
 
 A lightweight MQTT transport for existing Python device classes. The device class does not depend on MQTT. Transparent single-target method invocation and independent native Pub/Sub are provided. **Experimental; not verified with a real broker.**
+
+## Bundled MQTT broker
+
+`pip install .` installs `amqtt` (MQTT 3.1.1 broker) and `paho-mqtt` automatically. Start the local development broker with `mqtt-frame-broker` (default `127.0.0.1:1883`), or run `python examples/start_broker.py`. Authentication is disabled by default: do not expose this listener to untrusted networks. The RPC reply topic and correlation ID are carried in the JSON payload for MQTT 3.1.1 compatibility.

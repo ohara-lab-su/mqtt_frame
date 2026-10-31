@@ -34,8 +34,7 @@ class DeviceServer:
         except Exception as exc:
             response = {"id": request.get("id") if isinstance(locals().get("request"), dict) else None,
                         "ok": False, "error": {"type": type(exc).__name__, "message": str(exc)}}
-        properties = getattr(message, "properties", None)
-        response_topic = getattr(properties, "ResponseTopic", None)
+        response_topic = request.get("reply_to") if isinstance(locals().get("request"), dict) else None
         if response_topic:
             try:
                 payload = dumps(response)

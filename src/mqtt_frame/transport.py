@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 
 class Connection:
     def __init__(self, host="localhost", port=1883, client_id="", *, keepalive=60):
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id, protocol=mqtt.MQTTv5)
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id, protocol=mqtt.MQTTv311)
         self.host, self.port, self.keepalive = host, port, keepalive
         self._connected = threading.Event()
         self._subscriptions = set()

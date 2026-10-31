@@ -4,42 +4,135 @@
 
 ## 日本語
 
-このディレクトリには、
-既存のPythonデバイスクラスを変更せずにMQTT経由で公開する最小構成の例を収録しています。`device.py` は通信を知らない制御クラスです。
-`server.py` が公開し、`client.py` が元のメソッド名で呼び出します。`group_server.py` と `group_client.py` は一対多配信を示します。
+### 準備（Brokerもpipでインストールされます）
 
-### 事前準備
-
-Python 3.10以上と、別途起動したMQTT 5対応Broker（例：Mosquitto）が必要です。Broker自体はPythonパッケージの依存関係に含まれません。Brokerが
-`localhost:1883` で稼働していることを確認してください。
-
-リポジトリのルートで以下を実行します。
+Python 3.10以降を使用します。リポジトリのルートで次を実行してください。
 
 ```bash
 python -m pip install .
 ```
 
-`paho-mqtt` は `pyproject.toml` の通常依存関係として自動導入されます。追加の `pip install paho-mqtt` は不要です。
+`pyproject.toml` の通常依存関係に `paho-mqtt` と `amqtt` が含まれます。別途Mosquittoをインストールする必要はありません。**Brokerはインストールだけでは起動しません。** 以下の手順で起動します。
 
-### 1. 単一デバイスRPC
+### 1. PythonスクリプトからBrokerを起動（ターミナル1）
 
-ターミナル1：
+リポジトリのルートで次を実行します。
+
+```bash
+python examples/start_broker.py
+```
+
+`start_broker.py` は `mqtt_frame.broker.main()` を呼び出し、Python製aMQTT Brokerを `127.0.0.1:1883` で起動します。終了は Ctrl+C です。引数も渡せます。
+
+```bash
+python examples/start_broker.py --host 127.0.0.1 --port 1883
+```
+
+インストール時に登録されるコマンドから起動する場合は、次と等価です。**両方を同時に起動しないでください**（ポートが競合します）。
+
+```bash
+mqtt-frame-broker
+```
+
+### 2. 単一デバイスのメソッド呼び出し
+
+Brokerを起動したまま、ターミナル2でサーバーを起動します。
 
 ```bash
 python examples/server.py
 ```
 
-ターミナル2：
+ターミナル3でクライアントを実行します。
 
 ```bash
 python examples/client.py
 ```
 
-`client.py` は `move(100.0)` と `get_position()` を呼び出します。サーバー停止時はクライアントがタイムアウトします。終了はCtrl+Cです。
+`client.py` は `motor1` に対して `move(100.0)` と `get_position()` を実行します。`device.py` の `Motor` はMQTTに依存しません。
 
-### 2. 一対多の同一メソッド配信
+### 3. 一対多のメソッド配信（主用途）
 
-別々のターミナルで2台分のDeviceServerを起動します。
+単一デバイスのサーバーを停止してから、**Brokerは起動したまま**、別々のターミナルで次を実行します。
+
+ターミナル2：
+
+```bash
+python examples/group_server.py motor1
+```
+
+ターミナル3：
+
+```bash
+python examples/group_server.py motor2
+```
+
+両サーバーの購読開始を確認してから、ターミナル4で一度だけ要求を発行します。
+
+```bash
+python examples/group_client.py
+```
+
+`motors` グループの両サーバーに `move(100.0)` が配送され、それぞれのサーバー端末に `move(...)` の実行ログが表示されます。グループ要求は**応答を集約しません**。publish完了は各デバイスでの実行成功を保証しません。また、QoS 1での重複配送を排除していないため、実装例をそのまま実機の危険な操作に使用しないでください。
+
+### 4. 汎用Pub/Sub
+
+Brokerを起動した状態で、次を実行できます。
+
+```bash
+python examples/broadcast.py
+```
+
+これは `lab/motors/command` へJSONをpublishする独立した例です。上記のDeviceServerはこのTopicを購読しないため、Motorは動作しません。
+
+### 構成
+
+| ファイル | 用途 |
+| --- | --- |
+| `start_broker.py` | PythonからBrokerを起動 |
+| `device.py` | 通信非依存のMotor |
+| `server.py`, `client.py` | 一対一のRPC |
+| `group_server.py`, `group_client.py` | 一対多の同一メソッド配信 |
+| `broadcast.py` | 独立したPub/Sub publish |
+
+Brokerは開発用の匿名接続で、初期設定ではローカルホストのみにbindします。外部ネットワークへ公開する場合は認証・TLS・アクセス制御を別途設計してください。
+
+## English
+
+### Installation and broker startup
+
+From the repository root (Python 3.10+):
+
+```bash
+python -m pip install .
+```
+
+Both `paho-mqtt` and the Python broker `amqtt` are installed as standard dependencies. **Installation does not automatically start the broker.** Open terminal 1 and run:
+
+```bash
+python examples/start_broker.py
+```
+
+This runs the bundled broker on `127.0.0.1:1883`. You can alternatively use `mqtt-frame-broker`, but do not run both at once. Stop it with Ctrl+C.
+
+### Single-device RPC
+
+In terminal 2:
+
+```bash
+python examples/server.py
+```
+
+In terminal 3:
+
+```bash
+python examples/client.py
+```
+
+The client invokes `move(100.0)` and `get_position()` on `motor1`. The `Motor` class contains no MQTT code.
+
+### One-to-many method delivery
+
+Stop the single-device server, but leave the broker running. In two separate terminals:
 
 ```bash
 python examples/group_server.py motor1
@@ -49,46 +142,18 @@ python examples/group_server.py motor1
 python examples/group_server.py motor2
 ```
 
-3つ目のターミナルから一度だけ配信します。
+Once both servers have subscribed, run in a fourth terminal:
 
 ```bash
 python examples/group_client.py
 ```
 
-両サーバーが `devices/_groups/motors/rpc/request` を購読し、`move(100.0)` を受信します。
-**この例は要求配信であり、全装置の実行結果を回収するRPCではありません。** Brokerへのpublish成功は装置実行成功を意味しません。QoS
-1の再配送による重複実行も排除していません。
+Both servers should print their `move(100.0)` execution. Group delivery does **not** aggregate responses or guarantee device execution. QoS 1 may redeliver commands.
 
-### 3. 汎用Pub/Sub
+### Independent Pub/Sub
 
 ```bash
 python examples/broadcast.py
 ```
 
-`broadcast.py` は `lab/motors/command` にJSONメッセージを送ります。 **このTopicは上記DeviceServerのRPC
-Topicとは別物であり、実行例のMotorはこのメッセージで動作しません。** Subscriberを別途用意した場合にのみ受信できます。
-
-### ファイル対応
-
-| ファイル          | 役割                              |
-|-------------------|-----------------------------------|
-| `device.py`       | 通信非依存のMotorクラス           |
-| `server.py`       | 単一デバイスの公開                |
-| `client.py`       | 単一デバイスの透過呼び出し        |
-| `group_server.py` | グループTopicの購読               |
-| `group_client.py` | 一度のpublishで複数デバイスへ要求 |
-| `broadcast.py`    | RPCとは独立したPub/Subのpublish   |
-
-## English
-
-These examples expose an existing Python `Motor` class without adding MQTT code to the device class. Python 3.10+ and a
-separately running MQTT 5 broker at `localhost:1883` are required.
-
-```bash
-python -m pip install .
-```
-
-For single-device RPC, start `python examples/server.py` and then `python examples/client.py` in another terminal. For
-group delivery, start `python examples/group_server.py motor1` and `python examples/group_server.py motor2` in separate
-terminals, then run `python examples/group_client.py`. The group operation delivers a command; it does **not** aggregate
-results or guarantee execution. `broadcast.py` demonstrates an independent publish operation, not a device method call.
+This publishes to `lab/motors/command`, which the example device servers do not subscribe to. The default broker allows anonymous local connections and must not be exposed to untrusted networks.

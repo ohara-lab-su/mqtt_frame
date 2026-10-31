@@ -19,3 +19,7 @@ python -m pip install .
 
 
 [Examples / 実行例](examples/README.md) · [Documentation / ドキュメント](https://ohara-lab-su.github.io/mqtt_frame/)
+
+## Bundled MQTT broker
+
+`pip install .` installs `amqtt` (MQTT 3.1.1 broker) and `paho-mqtt` automatically. Start the local development broker with `mqtt-frame-broker` (default `127.0.0.1:1883`), or run `python examples/start_broker.py`. Authentication is disabled by default: do not expose this listener to untrusted networks. The RPC reply topic and correlation ID are carried in the JSON payload for MQTT 3.1.1 compatibility.
