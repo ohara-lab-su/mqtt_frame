@@ -7,15 +7,15 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/mqtt_frame/ja/)
 [![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.html)
 
-> **試作段階（実運用非推奨）**
+> **テストフェーズ**
 >
-> MQTT Brokerを使用した実通信試験は未実施です。再送・切断・多数接続・異常系の検証も完了していません。
+> MQTT Brokerを使用した最低限の動作テストは実施済みです。引き続き、再送・切断・多数接続・異常系などの検証が必要です。実運用に向けた検証は完了していません。
 
 既存のPython制御クラスを通信方式から独立させたまま、MQTTで公開するための軽量な通信フレームです。`ese774_frame`、`grpc_frame`と並ぶ独立した選択肢です。
 
 - 透過型RPC：既存の制御クラスを `DeviceServer` に渡し、`DeviceClient` から元のメソッド名で呼び出します。
 - MQTT Pub/Sub：`Publisher` と `Subscriber` でRPCと独立した一対多配信を行います。
-- 一対多の**デバイスメソッド呼び出し**は、今後の設計対象であり、この版では未実装です。
+- 一対多の**デバイスメソッド要求配信**：`GroupPublisher` と `DeviceServer(groups=...)` により、共通Topicを購読する複数サーバーに同じ要求を配信できます。応答集約は未実装です。
 
 ```bash
 python -m pip install .

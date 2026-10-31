@@ -15,7 +15,7 @@ design
 api
 ```
 
-A lightweight MQTT transport for existing Python device classes. The device class does not depend on MQTT. Transparent single-target method invocation and independent native Pub/Sub are provided. **Experimental; not verified with a real broker.**
+A lightweight MQTT transport for existing Python device classes. The device class does not depend on MQTT. Transparent single-target method invocation and independent native Pub/Sub are provided. **Testing phase: basic operation has been tested with an MQTT broker; broader validation is still required.**
 
 ## Bundled MQTT broker
 

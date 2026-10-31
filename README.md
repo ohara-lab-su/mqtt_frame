@@ -7,7 +7,9 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Documentation-222222?logo=githubpages&logoColor=white)](https://ohara-lab-su.github.io/mqtt_frame/en/)
 [![Ohara Lab](https://img.shields.io/badge/Ohara%20Lab-Home-4B5563?logo=homeassistant&logoColor=white)](https://ohara-lab-su.github.io/index.en.html)
 
-> **Experimental: not validated against a live MQTT broker.**
+> **Testing phase**
+>
+> Basic operation has been tested with an MQTT broker. Further validation is required for reconnection, redelivery, multiple concurrent clients, and error handling. The package is not yet validated for production use.
 
 Lightweight MQTT communication frame for existing Python device classes, alongside `ese774_frame` and `grpc_frame`. Device classes remain independent of communication. Dynamic single-device RPC and independent native Pub/Sub are provided. Group method-request delivery is available via `GroupPublisher` and `DeviceServer(groups=...)`; response aggregation and exactly-once execution are not implemented.
 
